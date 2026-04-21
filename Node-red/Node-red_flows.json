@@ -1,0 +1,579 @@
+[
+    {
+        "id": "ca3ec4e87fbb1f03",
+        "type": "tab",
+        "label": "Final",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "9db419e3c45746f3",
+        "type": "mqtt in",
+        "z": "ca3ec4e87fbb1f03",
+        "name": "",
+        "topic": "b6710545512/temphumidity",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "df2d65a70796372a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 180,
+        "y": 140,
+        "wires": [
+            [
+                "102871b4b7b6b2d7",
+                "90788b2d7dbcf752"
+            ]
+        ]
+    },
+    {
+        "id": "bc54f839462af562",
+        "type": "function",
+        "z": "ca3ec4e87fbb1f03",
+        "name": "temp_humidity_dust",
+        "func": "\n// var dataTH = msg.payload[\"b6710545512/temphumidity\"];\n// var dataDust = msg.payload[\"b6710545512/dust\"];\n\n// var temp = dataTH.temp;\n// var hum = dataTH.humidity;\n// var dust = dataDust.dust;\n\n// msg.topic = `\n// INSERT INTO air_data (temp, humidity, dust) \n// VALUES (${temp}, ${hum}, ${dust})\n// `;\n\n// return msg;\n\n\nvar dataTH = msg.payload[\"b6710545512/temphumidity\"];\nvar dataDust = msg.payload[\"b6710545512/dust\"];\n\nif (dataTH && dataDust && dataTH.temp > 0 && dataDust.dust > 0) {\n    var t = dataTH.temp;\n    var h = dataTH.humidity;\n    var d = dataDust.dust;\n\n    msg.topic = `INSERT INTO air_data (temp, humidity, dust) VALUES (${t}, ${h}, ${d})`;\n    return msg;\n}\n\nnode.warn(\"Data incomplete or zero - Waiting for next cycle\");\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 220,
+        "wires": [
+            [
+                "317b5a18c3ada814"
+            ]
+        ]
+    },
+    {
+        "id": "317b5a18c3ada814",
+        "type": "mysql",
+        "z": "ca3ec4e87fbb1f03",
+        "mydb": "308fce0ca4c641ad",
+        "name": "mysql",
+        "x": 610,
+        "y": 100,
+        "wires": [
+            [
+                "f998caa975b56351"
+            ]
+        ]
+    },
+    {
+        "id": "f998caa975b56351",
+        "type": "debug",
+        "z": "ca3ec4e87fbb1f03",
+        "name": "debug 9",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 760,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "d99e53de9f3ff365",
+        "type": "mqtt in",
+        "z": "ca3ec4e87fbb1f03",
+        "name": "",
+        "topic": "b6710545512/dust",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "df2d65a70796372a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 190,
+        "y": 240,
+        "wires": [
+            [
+                "102871b4b7b6b2d7",
+                "b9707dbe49dfc450"
+            ]
+        ]
+    },
+    {
+        "id": "102871b4b7b6b2d7",
+        "type": "join",
+        "z": "ca3ec4e87fbb1f03",
+        "name": "join",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "useparts": false,
+        "accumulate": true,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 390,
+        "y": 180,
+        "wires": [
+            [
+                "bc54f839462af562"
+            ]
+        ]
+    },
+    {
+        "id": "90788b2d7dbcf752",
+        "type": "debug",
+        "z": "ca3ec4e87fbb1f03",
+        "name": "debug 10",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 400,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "b9707dbe49dfc450",
+        "type": "debug",
+        "z": "ca3ec4e87fbb1f03",
+        "name": "debug 11",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 380,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "d26fc0b23ee916cd",
+        "type": "inject",
+        "z": "ca3ec4e87fbb1f03",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "3",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 460,
+        "wires": [
+            [
+                "5d140dd52b651af2"
+            ]
+        ]
+    },
+    {
+        "id": "9f5a71ef44bf5685",
+        "type": "mysql",
+        "z": "ca3ec4e87fbb1f03",
+        "mydb": "308fce0ca4c641ad",
+        "name": "mysql",
+        "x": 390,
+        "y": 380,
+        "wires": [
+            [
+                "9e03b817479b5019"
+            ]
+        ]
+    },
+    {
+        "id": "5d140dd52b651af2",
+        "type": "function",
+        "z": "ca3ec4e87fbb1f03",
+        "name": "function 9",
+        "func": "\nmsg.topic = \"SELECT * FROM air_data ORDER BY ts DESC;\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 580,
+        "wires": [
+            [
+                "9f5a71ef44bf5685"
+            ]
+        ]
+    },
+    {
+        "id": "9e03b817479b5019",
+        "type": "function",
+        "z": "ca3ec4e87fbb1f03",
+        "name": "sensor",
+        "func": "let data = msg.payload;\nlet totalDust = 0;\nlet totalTemp = 0;\nlet totalHum = 0;\nlet count = data.length;\n\ndata.forEach(function (row) {\n    totalDust += row.dust;\n    totalTemp += row.temp;\n    totalHum += row.humidity;\n});\n\nmsg.payload = {\n    dust: (totalDust / count).toFixed(1),\n    temp: (totalTemp / count).toFixed(1),\n    humidity: (totalHum / count).toFixed(1)\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 480,
+        "wires": [
+            [
+                "2745580240e1b321",
+                "f01c261cfa74b8a4",
+                "51f20bad3cdff7ca"
+            ]
+        ]
+    },
+    {
+        "id": "2745580240e1b321",
+        "type": "ui_text",
+        "z": "ca3ec4e87fbb1f03",
+        "group": "c721f6feddbda0e1",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Average Dust",
+        "format": "{{msg.payload.dust}} µg/m³",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 700,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "f01c261cfa74b8a4",
+        "type": "ui_text",
+        "z": "ca3ec4e87fbb1f03",
+        "group": "c721f6feddbda0e1",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Average Temperature",
+        "format": " {{msg.payload.temp}}  °C",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 720,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "51f20bad3cdff7ca",
+        "type": "ui_text",
+        "z": "ca3ec4e87fbb1f03",
+        "group": "c721f6feddbda0e1",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Average Humidity",
+        "format": "{{msg.payload.humidity}} %",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 710,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "213cc2cac130f64f",
+        "type": "inject",
+        "z": "ca3ec4e87fbb1f03",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "3",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 760,
+        "wires": [
+            [
+                "9eab2b4dfbb05034"
+            ]
+        ]
+    },
+    {
+        "id": "b788939f9bf2b9d5",
+        "type": "mysql",
+        "z": "ca3ec4e87fbb1f03",
+        "mydb": "308fce0ca4c641ad",
+        "name": "mysql",
+        "x": 350,
+        "y": 680,
+        "wires": [
+            [
+                "8f093ddacba8d5d3"
+            ]
+        ]
+    },
+    {
+        "id": "9eab2b4dfbb05034",
+        "type": "function",
+        "z": "ca3ec4e87fbb1f03",
+        "name": "function 10",
+        "func": "msg.topic = \"SELECT temp, humidity, precip, uvindex, cloudcover FROM bkk_weather ORDER BY datetime;\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 240,
+        "y": 880,
+        "wires": [
+            [
+                "b788939f9bf2b9d5"
+            ]
+        ]
+    },
+    {
+        "id": "8f093ddacba8d5d3",
+        "type": "function",
+        "z": "ca3ec4e87fbb1f03",
+        "name": "api",
+        "func": "let data = msg.payload;\nlet totalTemp = 0;\nlet totalHum = 0;\nlet totalCloud = 0;\nlet totalPrecip = 0;\nlet totalUV = 0;\nlet count = data.length;\n\nif (count > 0) {\n    data.forEach(function (row) {\n        totalTemp += parseFloat(row.temp) || 0;\n        totalHum += parseFloat(row.humidity) || 0;\n        totalCloud += parseFloat(row.cloudcover) || 0;\n        totalPrecip += parseFloat(row.precip) || 0;\n        totalUV += parseFloat(row.uvindex) || 0;\n    });\n\n    msg.payload = {\n        temp: (totalTemp / count).toFixed(1),\n        humidity: (totalHum / count).toFixed(1),\n        cloud: (totalCloud / count).toFixed(1),\n        precip: (totalPrecip / count).toFixed(2),\n        uv: (totalUV / count).toFixed(1)\n    };\n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 780,
+        "wires": [
+            [
+                "fdd62c629212459e",
+                "45158156cd55a96b",
+                "8af31844dad2e2c2",
+                "81ac61e8e34a9226",
+                "2e037b2cb9e5975d"
+            ]
+        ]
+    },
+    {
+        "id": "fdd62c629212459e",
+        "type": "ui_text",
+        "z": "ca3ec4e87fbb1f03",
+        "group": "c64db3e85618bf08",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Average Cloud Cover",
+        "format": "{{msg.payload.cloud}} %",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 700,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "45158156cd55a96b",
+        "type": "ui_text",
+        "z": "ca3ec4e87fbb1f03",
+        "group": "c64db3e85618bf08",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Average Temperature",
+        "format": " {{msg.payload.temp}}  °C",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 700,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "8af31844dad2e2c2",
+        "type": "ui_text",
+        "z": "ca3ec4e87fbb1f03",
+        "group": "c64db3e85618bf08",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Average Humidity",
+        "format": "{{msg.payload.humidity}} %",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 690,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "81ac61e8e34a9226",
+        "type": "ui_text",
+        "z": "ca3ec4e87fbb1f03",
+        "group": "c64db3e85618bf08",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Average Precipitation",
+        "format": "{{msg.payload.precip}} mm",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 700,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "2e037b2cb9e5975d",
+        "type": "ui_text",
+        "z": "ca3ec4e87fbb1f03",
+        "group": "c64db3e85618bf08",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Average UV",
+        "format": "{{msg.payload.uv}} ",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 670,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "df2d65a70796372a",
+        "type": "mqtt-broker",
+        "name": "KU Broker",
+        "broker": "iot.cpe.ku.ac.th",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "308fce0ca4c641ad",
+        "type": "MySQLdatabase",
+        "name": "",
+        "host": "iot.cpe.ku.ac.th",
+        "port": "3306",
+        "db": "b6710545512",
+        "tz": "",
+        "charset": "UTF8"
+    },
+    {
+        "id": "c721f6feddbda0e1",
+        "type": "ui_group",
+        "name": "Air Data - Sensor",
+        "tab": "5d32894fb7bfacc1",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "c64db3e85618bf08",
+        "type": "ui_group",
+        "name": "BKK Weather - API",
+        "tab": "5d32894fb7bfacc1",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "5d32894fb7bfacc1",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]

@@ -1,0 +1,296 @@
+[
+    {
+        "id": "ff30491d0bad28d1",
+        "type": "tab",
+        "label": "weather",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "9958add6f381fd57",
+        "type": "ui_chart",
+        "z": "ff30491d0bad28d1",
+        "name": "",
+        "group": "3244a3582c4903d1",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Temperature",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "20",
+        "ymax": "45",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 770,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e711b30745fa7f24",
+        "type": "ui_chart",
+        "z": "ff30491d0bad28d1",
+        "name": "",
+        "group": "3244a3582c4903d1",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Humidity",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "30",
+        "ymax": "80",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 760,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e3cbfad11f358a63",
+        "type": "ui_chart",
+        "z": "ff30491d0bad28d1",
+        "name": "",
+        "group": "3244a3582c4903d1",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Dust",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "10",
+        "ymax": "50",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 750,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9829c0a6f438a0ea",
+        "type": "inject",
+        "z": "ff30491d0bad28d1",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "3",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 250,
+        "y": 220,
+        "wires": [
+            [
+                "a0e55f94ea66d335"
+            ]
+        ]
+    },
+    {
+        "id": "26437d82169841c5",
+        "type": "mysql",
+        "z": "ff30491d0bad28d1",
+        "mydb": "308fce0ca4c641ad",
+        "name": "mysql",
+        "x": 450,
+        "y": 220,
+        "wires": [
+            [
+                "4f1ef002d75e6d38",
+                "257cae5a1896060d",
+                "5e95825ec268587a"
+            ]
+        ]
+    },
+    {
+        "id": "a0e55f94ea66d335",
+        "type": "function",
+        "z": "ff30491d0bad28d1",
+        "name": "function 9",
+        "func": "\nmsg.topic = \"SELECT * FROM air_data ORDER BY ts ASC;\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 340,
+        "wires": [
+            [
+                "26437d82169841c5"
+            ]
+        ]
+    },
+    {
+        "id": "4f1ef002d75e6d38",
+        "type": "function",
+        "z": "ff30491d0bad28d1",
+        "name": "Temp",
+        "func": "let chartData = [];\n\nmsg.payload.forEach(function (row) {\n    chartData.push({\n        \"x\": new Date(row.ts).getTime(),\n        \"y\": row.temp\n    });\n});\n\nmsg.payload = [{\n    \"series\": [\"Air Temperature\"],\n    \"data\": [chartData],\n    \"labels\": [\"Temperature\"]\n}];\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 160,
+        "wires": [
+            [
+                "9958add6f381fd57"
+            ]
+        ]
+    },
+    {
+        "id": "257cae5a1896060d",
+        "type": "function",
+        "z": "ff30491d0bad28d1",
+        "name": "Humid",
+        "func": "let chartData = [];\n\nmsg.payload.forEach(function (row) {\n    chartData.push({\n        \"x\": new Date(row.ts).getTime(),\n        \"y\": row.humidity\n    });\n});\n\nmsg.payload = [{\n    \"series\": [\"Humidity\"],\n    \"data\": [chartData],\n    \"labels\": [\"Humidity (%)\"]\n}];\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 220,
+        "wires": [
+            [
+                "e711b30745fa7f24"
+            ]
+        ]
+    },
+    {
+        "id": "5e95825ec268587a",
+        "type": "function",
+        "z": "ff30491d0bad28d1",
+        "name": "Dust",
+        "func": "let chartData = [];\n\nmsg.payload.forEach(function (row) {\n    chartData.push({\n        \"x\": new Date(row.ts).getTime(),\n        \"y\": row.dust\n    });\n});\n\n// ส่งข้อมูลเป็นชุด Array เพื่อให้กราฟวาดทันที\nmsg.payload = [{\n    \"series\": [\"PM2.5\"],\n    \"data\": [chartData],\n    \"labels\": [\"Dust (µg/m³)\"]\n}];\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 280,
+        "wires": [
+            [
+                "e3cbfad11f358a63"
+            ]
+        ]
+    },
+    {
+        "id": "3244a3582c4903d1",
+        "type": "ui_group",
+        "name": "Weather",
+        "tab": "7b4fd188d53da4a3",
+        "order": 1,
+        "disp": true,
+        "width": "15",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "308fce0ca4c641ad",
+        "type": "MySQLdatabase",
+        "name": "",
+        "host": "iot.cpe.ku.ac.th",
+        "port": "3306",
+        "db": "b6710545512",
+        "tz": "",
+        "charset": "UTF8"
+    },
+    {
+        "id": "7b4fd188d53da4a3",
+        "type": "ui_tab",
+        "name": "Home2",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
